@@ -14,7 +14,7 @@ class Game:
         #self.font = pg.font.Font('Arial', 32)
         self.running = True
 
-        self.character_spritesheet = Spritesheet('assets/sprites/pac_sprites.png')
+        self.pacman_spritesheet = Spritesheet('assets/sprites/pac_sprites.png')
         self.terrain_spritesheet = Spritesheet('assets/sprites/pac_wall.jpg')
         self.ghost_spritesheet = Spritesheet('assets/sprites/pac_sprites.png')
         self.dot_spritesheet = Spritesheet('assets/sprites/dots.jpg')
@@ -24,6 +24,7 @@ class Game:
         self.playing = True
 
         self.all_sprites = pg.sprite.LayeredUpdates()
+        self.pacman = pg.sprite.LayeredUpdates()
         self.blocks = pg.sprite.LayeredUpdates()
         self.ghosts = pg.sprite.LayeredUpdates()
         self.dots = pg.sprite.LayeredUpdates()
@@ -36,6 +37,7 @@ class Game:
             if event.type == pg.QUIT:
                 self.playing = False
                 self.running = False
+                
 
     def createTilemap(self):
         #displays the tiles according to the map written in the config file
@@ -64,6 +66,7 @@ class Game:
         self.all_sprites.draw(self.screen)
         self.clock.tick(FPS)
         pg.display.update()
+
 
 
     def main(self):

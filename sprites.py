@@ -1,7 +1,7 @@
 import pygame as pg
 from config import *
 import math
-import random
+
 
 class Spritesheet:
     def __init__(self, file):
@@ -18,26 +18,48 @@ class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
         self._layer = PLAYER_LAYER
-        self.groups = self.game.all_sprites
+
+        self.groups = self.game.all_sprites, self.game.pacman
         pg.sprite.Sprite.__init__(self, self.groups)
+
+        #self.groups = self.game.all_sprites
+        #pg.sprite.Sprite.__init__(self, self.groups)
 
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
+        self.width = TILESIZE-2
+        self.height = TILESIZE-2
         self.facing = 'right'
+        self.frame = 0
 
         self.x_change = 0
         self.y_change = 0
 
-        self.image = self.game.character_spritesheet.get_sprite(0,0, self.width, self.height)
-
+        self.image = self.game.pacman_spritesheet.get_sprite(0,0, self.width, self.height)
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
 
-        self.frame = 0
         
+        self.left = [self.game.pacman_spritesheet.get_sprite(0,0, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(32*2,32, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(32*3,32, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(32*2,32, self.width, self.height) ]
+
+        self.right = [self.game.pacman_spritesheet.get_sprite(0,0, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(0,32, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(32,32, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(0,32, self.width, self.height) ]
+
+        self.down = [self.game.pacman_spritesheet.get_sprite(0,0, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(32*2,64, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(32*3,64, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(32*2,64, self.width, self.height) ]
+
+        self.up = [self.game.pacman_spritesheet.get_sprite(0,0, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(0,64, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(32,64, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(0,64, self.width, self.height) ]
 
     def update(self):
         self.movement()
@@ -57,17 +79,15 @@ class Player(pg.sprite.Sprite):
         if keys[pg.K_LEFT]:
             self.x_change -=SPEED
             self.facing = 'left'
-        elif keys[pg.K_RIGHT]:
+        if keys[pg.K_RIGHT]:
             self.x_change+=SPEED
             self.facing = 'right'
-        elif keys[pg.K_UP]:
+        if keys[pg.K_UP]:
             self.y_change-=SPEED
             self.facing = 'up'
-        elif keys[pg.K_DOWN]:
+        if keys[pg.K_DOWN]:
             self.y_change+=SPEED
             self.facing = 'down'
-
-
 
 
     def collide_blocks(self, direction):
@@ -94,56 +114,30 @@ class Player(pg.sprite.Sprite):
             #maybe game over screen in future
             self.game.playing = False
             self.game.running = False
-
-
-
+    
 
     def animate(self):
-        left = [self.game.character_spritesheet.get_sprite(0,0, self.width, self.height), 
-                    self.game.character_spritesheet.get_sprite(32*2,32, self.width, self.height),
-                    self.game.character_spritesheet.get_sprite(32*3,32, self.width, self.height), 
-                    self.game.character_spritesheet.get_sprite(32*2,32, self.width, self.height) ]
-
-        right = [self.game.character_spritesheet.get_sprite(0,0, self.width, self.height), 
-                    self.game.character_spritesheet.get_sprite(0,32, self.width, self.height),
-                    self.game.character_spritesheet.get_sprite(32,32, self.width, self.height), 
-                    self.game.character_spritesheet.get_sprite(0,32, self.width, self.height) ]
-
-        down = [self.game.character_spritesheet.get_sprite(0,0, self.width, self.height), 
-                    self.game.character_spritesheet.get_sprite(32*2,64, self.width, self.height),
-                    self.game.character_spritesheet.get_sprite(32*3,64, self.width, self.height), 
-                    self.game.character_spritesheet.get_sprite(32*2,64, self.width, self.height) ]
-
-        up = [self.game.character_spritesheet.get_sprite(0,0, self.width, self.height), 
-                    self.game.character_spritesheet.get_sprite(0,64, self.width, self.height),
-                    self.game.character_spritesheet.get_sprite(32,64, self.width, self.height), 
-                    self.game.character_spritesheet.get_sprite(0,64, self.width, self.height) ]
-
-
 
         if self.facing == 'left':
-            self.image = left[math.floor(self.frame)]
+            self.image = self.left[math.floor(self.frame)]
             self.frame+=0.2
             if self.frame > 3.6:
                 self.frame = 0
-
 
         if self.facing == 'right':
-            self.image = right[math.floor(self.frame)]
+            self.image = self.right[math.floor(self.frame)]
             self.frame+=0.2
             if self.frame > 3.6:
                 self.frame = 0
-
 
         if self.facing == 'up':
-            self.image = up[math.floor(self.frame)]
+            self.image = self.up[math.floor(self.frame)]
             self.frame+=0.2
             if self.frame > 3.6:
                 self.frame = 0
 
-
         if self.facing == 'down':
-            self.image = down[math.floor(self.frame)]
+            self.image = self.down[math.floor(self.frame)]
             self.frame+=0.2
             if self.frame > 3.6:
                 self.frame = 0
@@ -293,6 +287,7 @@ class Block(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.value = 1
 
 
 
@@ -300,10 +295,10 @@ class Block(pg.sprite.Sprite):
 class Dot(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self.game = game
+        self.visible = True
         self._layer = DOT_LAYER
         self.groups = self.game.all_sprites, self.game.dots
         pg.sprite.Sprite.__init__(self, self.groups)
-
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.width = TILESIZE
@@ -313,6 +308,16 @@ class Dot(pg.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
     
+    def update(self):
+        hits = pg.sprite.spritecollide(self, self.game.pacman, False)
+        if hits and self.visible is True:
+            self.visible = False
+            self.image = self.game.dot_spritesheet.get_sprite(0,0, 1, 1)
+
+
+
+
+
 
 
 
