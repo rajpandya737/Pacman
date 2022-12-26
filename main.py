@@ -18,6 +18,7 @@ class Game:
         self.terrain_spritesheet = Spritesheet('assets/sprites/pac_wall.jpg')
         self.ghost_spritesheet = Spritesheet('assets/sprites/pac_sprites.png')
         self.dot_spritesheet = Spritesheet('assets/sprites/dots.jpg')
+        self.num_dots = 0
 
 
     def new(self):
@@ -56,8 +57,14 @@ class Game:
                 elif col == 'C':
                     Clyde(self, j, i)
                 elif col == '.':
+                    self.num_dots+=1
                     Dot(self, j, i)
     
+    def check_dots(self):
+        if self.num_dots == 0:
+            self.playing = False
+            self.running = False
+
     def update(self):
         self.all_sprites.update()
 
@@ -68,12 +75,13 @@ class Game:
         pg.display.update()
 
 
-
     def main(self):
         while self.playing:
             self.events()
             self.update()
+            self.check_dots()
             self.draw()
+    
         
 
 

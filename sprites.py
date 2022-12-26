@@ -313,6 +313,7 @@ class Dot(pg.sprite.Sprite):
         if hits and self.visible is True:
             self.visible = False
             self.image = self.game.dot_spritesheet.get_sprite(0,0, 1, 1)
+            self.game.num_dots-=1
 
 
 
