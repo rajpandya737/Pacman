@@ -17,6 +17,7 @@ class Game:
         self.character_spritesheet = Spritesheet('assets/sprites/pac_sprites.png')
         self.terrain_spritesheet = Spritesheet('assets/sprites/pac_wall.jpg')
         self.ghost_spritesheet = Spritesheet('assets/sprites/pac_sprites.png')
+        self.dot_spritesheet = Spritesheet('assets/sprites/dots.jpg')
 
 
     def new(self):
@@ -25,7 +26,8 @@ class Game:
         self.all_sprites = pg.sprite.LayeredUpdates()
         self.blocks = pg.sprite.LayeredUpdates()
         self.ghosts = pg.sprite.LayeredUpdates()
-        #self.player = Player(self, 1, 2)
+        self.dots = pg.sprite.LayeredUpdates()
+
         self.createTilemap()
     
     def events(self):
@@ -41,16 +43,18 @@ class Game:
             for j, col in enumerate(row):
                 if col == 'W':
                     Block(self, j, i)
-                if col == 'U':
+                elif col == 'U':
                     Player(self, j, i)
-                if col == 'I':
+                elif col == 'I':
                     Inky(self, j, i)
-                if col == 'P':
+                elif col == 'P':
                     Pinky(self, j, i)
-                if col == 'B':
-                    Blinky(self, i, j)
-                if col == 'C':
-                    Clyde(self, i, j)
+                elif col == 'B':
+                    Blinky(self, j, i)
+                elif col == 'C':
+                    Clyde(self, j, i)
+                elif col == '.':
+                    Dot(self, j, i)
     
     def update(self):
         self.all_sprites.update()
