@@ -1,6 +1,7 @@
 import pygame as pg
 from config import *
 import math
+import random
 
 
 class Spritesheet:
@@ -153,6 +154,8 @@ class Ghost(pg.sprite.Sprite):
         self.move_loop = 0
 
     def update(self):
+        self.animate()
+        self.movement()
         self.rect.x+=self.x_change
         self.rect.y+=self.y_change
         self.x_change = 0
@@ -171,6 +174,24 @@ class Blinky(Ghost):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+        self.coords = (9,10)
+
+
+        self.map = TILEMAP
+        #self.x_change -= SPEED
+        for i, row in enumerate(self.map):
+            self.map[i] = list(row)
+
+        for i, row in enumerate(self.map):
+            for j, v in enumerate(row):
+                if v != 'B' or v != 'W' or 'S':
+                    self.map[i][j] = '-'
+                
+                elif v == 'B':
+                    self.map[i][j] = 'X'
+                    self.coords = (i, j)
+
+
     
     def animate(self):
         if self.facing == 'right':
@@ -184,6 +205,29 @@ class Blinky(Ghost):
             
         if self.facing == 'up':
             self.image = self.game.ghost_spritesheet.get_sprite(96,96, self.width, self.height)
+
+    
+    def movement(self):
+        
+        
+        path = self.bfs()
+
+
+    def bfs(self):
+        #pick a random coordinate and BFS to generate best path to get there
+        #use simulated 'do while loop' such as from java to achieve this
+        #return the fastest path in a list containing several tuples that have coordinates
+        x = 0
+        y = 0
+        while True:
+            x = random.randrange(len(TILEMAP[0]))
+            y = random.randrange(len(TILEMAP))
+
+            if self.map[x][y] == '.':
+                break
+
+
+
 
 
 class Inky(Ghost):
@@ -267,6 +311,8 @@ class Pinky(Ghost):
 
         if self.facing == 'up':
             self.image = self.game.ghost_spritesheet.get_sprite(96,192, self.width, self.height)
+    
+
 
 
 

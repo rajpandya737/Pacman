@@ -81,8 +81,7 @@ class Game:
             self.update()
             self.check_dots()
             self.draw()
-    
-        
+
 
 
 if __name__ == '__main__':
