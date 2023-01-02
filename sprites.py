@@ -2,6 +2,7 @@ import pygame as pg
 from config import *
 import math
 import random
+from node import *
 
 
 class Spritesheet:
@@ -161,6 +162,12 @@ class Ghost(pg.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
     
+    def valid(map, x, y):
+    
+        if x >=0 and x <=TM_X-1 and y >=0 and y <= TM_Y-1 and map[x][y] !='W':
+            return True
+        return False
+    
 
 class Blinky(Ghost):
     def __init__(self, game, x, y):
@@ -192,24 +199,10 @@ class Blinky(Ghost):
                     self.coords = (i, j)
 
 
-    
-    def animate(self):
-        if self.facing == 'right':
-            self.image = self.game.ghost_spritesheet.get_sprite(0,96, self.width, self.height)
-
-        if self.facing == 'left':
-            self.image = self.game.ghost_spritesheet.get_sprite(32,96, self.width, self.height)
-
-        if self.facing == 'down':
-            self.image = self.game.ghost_spritesheet.get_sprite(64,96, self.width, self.height)
-            
-        if self.facing == 'up':
-            self.image = self.game.ghost_spritesheet.get_sprite(96,96, self.width, self.height)
 
     
     def movement(self):
-        
-        
+
         path = self.bfs()
 
 
@@ -224,7 +217,55 @@ class Blinky(Ghost):
             y = random.randrange(len(TILEMAP))
 
             if self.map[x][y] == '.':
+                self.map[x][y] = 'X'
                 break
+        
+        directions = [(-1,0), (1,0), (0, -1), (0, 1)]
+        cur_x, cur_y = -1, -1
+        tar_x, tar_y = -1, -1
+        for i in range(TM_X):
+            for j in range(TM_Y):
+                if map[i][j] == 'B':
+                    cur_x, cur_y = i, j
+                if map[i] [j] == 'X':
+                    tar_x, tar_y = i, j
+        start = Node(cur_x, cur_y, 0)
+
+        visited = [start]
+        queue = [start]
+
+        while queue:
+            cur_node = queue.pop(0)
+            x, y = cur_node.get_coords()
+            if x == tar_x and y == tar_y:
+                path = []
+                while True:
+                    print(cur_node)
+                    path.append(cur_node.get_coords())
+                    cur_node = cur_node.get_prev()
+                    if cur_node == 0:
+                        return (path)
+            for d in directions:
+                if self.valid(map, x+d[0], y+d[1]) and [x+d[0], y+d[1]] not in visited:
+                    n = Node(x+d[0], y+d[1], cur_node)
+                    visited.append(n)
+                    queue.append(n)
+
+
+    def animate(self):
+        if self.facing == 'right':
+            self.image = self.game.ghost_spritesheet.get_sprite(0,96, self.width, self.height)
+
+        if self.facing == 'left':
+            self.image = self.game.ghost_spritesheet.get_sprite(32,96, self.width, self.height)
+
+        if self.facing == 'down':
+            self.image = self.game.ghost_spritesheet.get_sprite(64,96, self.width, self.height)
+            
+        if self.facing == 'up':
+            self.image = self.game.ghost_spritesheet.get_sprite(96,96, self.width, self.height)
+
+
 
 
 
