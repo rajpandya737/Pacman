@@ -26,7 +26,7 @@ TILEMAP = [
 'WWWW.WWW.W.WWWWWWWWW',
 'WWWW...........WWWWW',
 'WWWW.WWWW-WWWW.WWWWW',
-'W....W...B...W.....W',
+'W....WI.B.P.CW.....W',
 'W.WWWWWWWWWWWWWWWW.W',
 'W.WWW..........WWW.W',
 'W.....WWWWWWWW.....W',

@@ -2,6 +2,7 @@
 from collections import deque
 import random
 
+#JUST A FILE THAT HAS SKELETON BFS, NOT USED IN THE PROGRAM
 class Node:
     def __init__(self, x, y, prev=0):
         self.x = x
