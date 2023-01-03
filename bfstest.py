@@ -1,5 +1,6 @@
 
 from collections import deque
+import random
 
 class Node:
     def __init__(self, x, y, prev=0):
@@ -24,11 +25,11 @@ def valid(map, x, y):
 
 map_x = 20
 map_y = 20
-map = [
+new_map = [
 'WWWWWWWWWWWWWWWWWWWW',
 'W........W.........W',
 'W.WW.WWW.W.WWWW.WW.W',
-'W........X.........W',
+'W..................W',
 'W.WW.W.WWWWW.W.WWW.W',
 'W....W...W.........W',
 'WWWW.WWW.W.WWWWWWWWW',
@@ -47,6 +48,21 @@ map = [
 'WWWWWWWWWWWWWWWWWWWW'
 ]
 
+map = []
+for row in new_map:
+    map.append(list(row))
+
+while True:
+        x = random.randrange(len(map[0]))
+        y = random.randrange(len(map))
+        new_map = []
+        for row in map:
+            new_map.append(list(row))
+
+        if map[x][y] == '.':
+            map[x][y] = 'X'
+            break
+
 directions = [(-1,0), (1,0), (0, -1), (0, 1)]
 cur_x, cur_y = -1, -1
 tar_x, tar_y = -1, -1
@@ -62,13 +78,14 @@ visited = [start]
 found = False
 queue = [start]
 
+print('time')
+
 while queue:
     cur_node = queue.pop(0)
     x, y = cur_node.get_coords()
     if x == tar_x and y == tar_y:
         path = []
         while True:
-            print(cur_node)
             path.append(cur_node.get_coords())
             cur_node = cur_node.get_prev()
             if cur_node == 0:
@@ -80,7 +97,7 @@ while queue:
     for d in directions:
         if valid(map, x+d[0], y+d[1]) and [x+d[0], y+d[1]] not in visited:
             n = Node(x+d[0], y+d[1], cur_node)
-            visited.append(n)
+            visited.append([x+d[0], y+d[1]])
             queue.append(n)
 
 

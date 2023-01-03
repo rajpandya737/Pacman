@@ -157,12 +157,13 @@ class Ghost(pg.sprite.Sprite):
     def update(self):
         self.animate()
         self.movement()
+        print('test')
         self.rect.x+=self.x_change
         self.rect.y+=self.y_change
         self.x_change = 0
         self.y_change = 0
     
-    def valid(map, x, y):
+    def valid(self, map, x, y):
     
         if x >=0 and x <=TM_X-1 and y >=0 and y <= TM_Y-1 and map[x][y] !='W':
             return True
@@ -182,28 +183,42 @@ class Blinky(Ghost):
         self.rect.x = self.x
         self.rect.y = self.y
         self.coords = (9,10)
+        self.path = []
 
+        self.start = True
+        self.map = []
+        for row in TILEMAP[:]:
+            self.map.append(list(row))
 
-        self.map = TILEMAP
         #self.x_change -= SPEED
         for i, row in enumerate(self.map):
             self.map[i] = list(row)
 
         for i, row in enumerate(self.map):
             for j, v in enumerate(row):
-                if v != 'B' or v != 'W' or 'S':
-                    self.map[i][j] = '-'
-                
-                elif v == 'B':
-                    self.map[i][j] = 'X'
+                if v == 'B':
                     self.coords = (i, j)
 
 
 
     
     def movement(self):
+        if self.start is True:
+            self.start = False
+            self.path = self.bfs()
+            print(self.path)
+        x, y = self.path.pop()
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.coords = (x,y)
 
-        path = self.bfs()
+        
+
+
+
+
 
 
     def bfs(self):
@@ -212,43 +227,43 @@ class Blinky(Ghost):
         #return the fastest path in a list containing several tuples that have coordinates
         x = 0
         y = 0
+        print(self.map)
         while True:
-            x = random.randrange(len(TILEMAP[0]))
-            y = random.randrange(len(TILEMAP))
+            x = random.randrange(TM_X)
+            y = random.randrange(TM_Y)
 
             if self.map[x][y] == '.':
                 self.map[x][y] = 'X'
                 break
-        
+        print('done', x, y)
         directions = [(-1,0), (1,0), (0, -1), (0, 1)]
         cur_x, cur_y = -1, -1
         tar_x, tar_y = -1, -1
         for i in range(TM_X):
             for j in range(TM_Y):
-                if map[i][j] == 'B':
+                if self.map[i][j] == 'B':
                     cur_x, cur_y = i, j
-                if map[i] [j] == 'X':
+                if self.map[i] [j] == 'X':
                     tar_x, tar_y = i, j
         start = Node(cur_x, cur_y, 0)
 
         visited = [start]
         queue = [start]
-
+        print('time')
         while queue:
             cur_node = queue.pop(0)
             x, y = cur_node.get_coords()
             if x == tar_x and y == tar_y:
                 path = []
                 while True:
-                    print(cur_node)
                     path.append(cur_node.get_coords())
                     cur_node = cur_node.get_prev()
                     if cur_node == 0:
                         return (path)
             for d in directions:
-                if self.valid(map, x+d[0], y+d[1]) and [x+d[0], y+d[1]] not in visited:
+                if self.valid(self.map, x+d[0], y+d[1]) and [x+d[0], y+d[1]] not in visited:
                     n = Node(x+d[0], y+d[1], cur_node)
-                    visited.append(n)
+                    visited.append([x+d[0], y+d[1]])
                     queue.append(n)
 
 
