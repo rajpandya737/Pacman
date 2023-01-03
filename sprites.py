@@ -153,19 +153,19 @@ class Ghost(pg.sprite.Sprite):
         self.y_change = 0
         self.facing = 'up'
         self.move_loop = 0
+        self.frame = 0
 
     def update(self):
         self.animate()
         self.movement()
-        print('test')
         self.rect.x+=self.x_change
         self.rect.y+=self.y_change
         self.x_change = 0
         self.y_change = 0
     
-    def valid(self, map, x, y):
+    def valid(self, x, y):
     
-        if x >=0 and x <=TM_X-1 and y >=0 and y <= TM_Y-1 and map[x][y] !='W':
+        if x >=0 and x <=TM_X-1 and y >=0 and y <= TM_Y-1 and self.map[x][y] !='W':
             return True
         return False
     
@@ -182,37 +182,34 @@ class Blinky(Ghost):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-        self.coords = (9,10)
+        self.coords = (9,9)
+        self.goal = (0,0)
         self.path = []
 
         self.start = True
         self.map = []
-        for row in TILEMAP[:]:
-            self.map.append(list(row))
-
-        #self.x_change -= SPEED
-        for i, row in enumerate(self.map):
-            self.map[i] = list(row)
-
-        for i, row in enumerate(self.map):
-            for j, v in enumerate(row):
-                if v == 'B':
-                    self.coords = (i, j)
-
 
 
     
     def movement(self):
-        if self.start is True:
-            self.start = False
+        if not self.path:
+            self.map.clear()
+            for row in WALLS[:]:
+                self.map.append(list(row))
+
+            self.map[self.coords[0]][self.coords[1]] = 'B'
             self.path = self.bfs()
-            print(self.path)
-        x, y = self.path.pop()
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.rect.x = self.x
-        self.rect.y = self.y
-        self.coords = (x,y)
+        
+        if self.frame %10 == 0:
+            y,x = self.path.pop()
+            print(x,y)
+            self.x = x * TILESIZE
+            self.y = y * TILESIZE
+            self.rect.x = self.x
+            self.rect.y = self.y
+            self.coords = (x,y)
+            self.map[x][y] = 'B'
+        self.frame+=1
 
         
 
@@ -222,9 +219,6 @@ class Blinky(Ghost):
 
 
     def bfs(self):
-        #pick a random coordinate and BFS to generate best path to get there
-        #use simulated 'do while loop' such as from java to achieve this
-        #return the fastest path in a list containing several tuples that have coordinates
         x = 0
         y = 0
         print(self.map)
@@ -234,34 +228,36 @@ class Blinky(Ghost):
 
             if self.map[x][y] == '.':
                 self.map[x][y] = 'X'
+                self.goal = (x,y)
                 break
-        print('done', x, y)
+
         directions = [(-1,0), (1,0), (0, -1), (0, 1)]
         cur_x, cur_y = -1, -1
         tar_x, tar_y = -1, -1
         for i in range(TM_X):
             for j in range(TM_Y):
-                if self.map[i][j] == 'B':
+                if self.map[j][i] == 'B':
                     cur_x, cur_y = i, j
-                if self.map[i] [j] == 'X':
+                if self.map[j] [i] == 'X':
                     tar_x, tar_y = i, j
         start = Node(cur_x, cur_y, 0)
 
-        visited = [start]
+        visited = [[cur_x, cur_y]]
         queue = [start]
-        print('time')
         while queue:
             cur_node = queue.pop(0)
             x, y = cur_node.get_coords()
             if x == tar_x and y == tar_y:
+                print(x,y,tar_x,tar_y)
                 path = []
                 while True:
                     path.append(cur_node.get_coords())
                     cur_node = cur_node.get_prev()
                     if cur_node == 0:
-                        return (path)
+
+                        return path
             for d in directions:
-                if self.valid(self.map, x+d[0], y+d[1]) and [x+d[0], y+d[1]] not in visited:
+                if self.map[x+d[0]][y+d[1]] !='W' and [x+d[0], y+d[1]] not in visited:
                     n = Node(x+d[0], y+d[1], cur_node)
                     visited.append([x+d[0], y+d[1]])
                     queue.append(n)
@@ -367,12 +363,6 @@ class Pinky(Ghost):
 
         if self.facing == 'up':
             self.image = self.game.ghost_spritesheet.get_sprite(96,192, self.width, self.height)
-    
-
-
-
-
-
 
 class Block(pg.sprite.Sprite):
     def __init__(self, game, x, y):
