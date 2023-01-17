@@ -151,7 +151,7 @@ class Ghost(pg.sprite.Sprite):
         self.height = TILESIZE
         self.x_change = 0
         self.y_change = 0
-        self.facing = 'up'
+        self.facing = 'right'
         self.move_loop = 0
         self.frame = 1
         self.path = []
@@ -163,7 +163,7 @@ class Ghost(pg.sprite.Sprite):
 
     def update(self):
         self.animate()
-        self.movement()
+        #self.movement()
         self.rect.x+=self.x_change
         self.rect.y+=self.y_change
         self.x_change = 0
@@ -174,6 +174,76 @@ class Ghost(pg.sprite.Sprite):
             return True
         return False
         
+    def change_face(self, x, y):
+        if x < self.coords[0]:
+            self.facing = 'left'
+        elif x > self.coords[0]:
+            self.facing = 'right'
+        elif y < self.coords[1]:
+            self.facing = 'up'
+        elif y > self.coords[1]:
+            self.facing = 'down'
+    
+    def bfs(self, letter):
+        x = 0
+        y = 0
+        while True:
+            x = random.randrange(TM_X)
+            y = random.randrange(TM_Y)
+
+            if self.map[x][y] == '.':
+                self.map[x][y] = 'X'
+                self.goal = (x,y)
+                break
+
+        directions = [(-1,0), (1,0), (0, -1), (0, 1)]
+        cur_x, cur_y = -1, -1
+        tar_x, tar_y = -1, -1
+        for i in range(TM_X):
+            for j in range(TM_Y):
+                if self.map[j][i] == letter:
+                    cur_x, cur_y = i, j
+                if self.map[j] [i] == 'X':
+                    tar_x, tar_y = i, j
+        start = Node(cur_x, cur_y, 0)
+        visited = [[cur_x, cur_y]]
+        queue = [start]
+        while queue:
+            cur_node = queue.pop(0)
+            x, y = cur_node.get_coords()
+            if x == tar_x and y == tar_y:
+                path = []
+                while True:
+                    path.append(cur_node.get_coords())
+                    cur_node = cur_node.get_prev()
+                    if cur_node == 0:
+                        return path
+            for d in directions:
+                if self.map[x+d[0]][y+d[1]] !='W' and [x+d[0], y+d[1]] not in visited:
+                    n = Node(x+d[0], y+d[1], cur_node)
+                    visited.append([x+d[0], y+d[1]])
+                    queue.append(n)
+
+    def movement(self, letter):
+        if not self.path:
+            self.map.clear()
+            for row in WALLS[:]:
+                self.map.append(list(row))
+            self.map[self.coords[0]][self.coords[1]] = letter
+            self.path = self.bfs(letter)
+        
+        if self.frame % self.mass == 0:
+            y,x = self.path.pop()
+            #print(x,y)
+            self.x = x * TILESIZE
+            self.y = y * TILESIZE
+            self.change_face(x,y)
+            self.rect.x = self.x
+            self.rect.y = self.y
+            self.coords = (x,y)
+            self.map[x][y] = letter
+        self.frame+=1
+
 
 
 class Blinky(Ghost):
@@ -191,72 +261,6 @@ class Blinky(Ghost):
         self.coords = (8,9)
 
 
-    
-    def movement(self):
-        if not self.path:
-            self.map.clear()
-            for row in WALLS[:]:
-                self.map.append(list(row))
-            self.map[self.coords[0]][self.coords[1]] = 'B'
-            self.path = self.bfs()
-        
-        if self.frame % self.mass == 0:
-            y,x = self.path.pop()
-            print(x,y)
-            self.x = x * TILESIZE
-            self.y = y * TILESIZE
-            self.rect.x = self.x
-            self.rect.y = self.y
-            self.coords = (x,y)
-            self.map[x][y] = 'B'
-        self.frame+=1
-
-
-
-    def bfs(self):
-        x = 0
-        y = 0
-        while True:
-            x = random.randrange(TM_X)
-            y = random.randrange(TM_Y)
-
-            if self.map[x][y] == '.':
-                self.map[x][y] = 'X'
-                self.goal = (x,y)
-                break
-
-        directions = [(-1,0), (1,0), (0, -1), (0, 1)]
-        cur_x, cur_y = -1, -1
-        tar_x, tar_y = -1, -1
-        for i in range(TM_X):
-            for j in range(TM_Y):
-                if self.map[j][i] == 'B':
-                    cur_x, cur_y = i, j
-                if self.map[j] [i] == 'X':
-                    tar_x, tar_y = i, j
-        start = Node(cur_x, cur_y, 0)
-        visited = [[cur_x, cur_y]]
-        queue = [start]
-        while queue:
-            cur_node = queue.pop(0)
-            x, y = cur_node.get_coords()
-            if x == tar_x and y == tar_y:
-                path = []
-                while True:
-                    path.append(cur_node.get_coords())
-                    cur_node = cur_node.get_prev()
-                    if cur_node == 0:
-                        if path is None:
-                            return self.bfs()
-                        else:
-                            return path
-            for d in directions:
-                if self.map[x+d[0]][y+d[1]] !='W' and [x+d[0], y+d[1]] not in visited:
-                    n = Node(x+d[0], y+d[1], cur_node)
-                    visited.append([x+d[0], y+d[1]])
-                    queue.append(n)
-
-
     def animate(self):
         if self.facing == 'right':
             self.image = self.game.ghost_spritesheet.get_sprite(0,96, self.width, self.height)
@@ -269,6 +273,8 @@ class Blinky(Ghost):
             
         if self.facing == 'up':
             self.image = self.game.ghost_spritesheet.get_sprite(96,96, self.width, self.height)
+        
+        self.movement('B')
 
 
 
@@ -290,66 +296,6 @@ class Inky(Ghost):
         self.coords = (6,9)
 
 
-    def movement(self):
-        if not self.path:
-            self.map.clear()
-            for row in WALLS[:]:
-                self.map.append(list(row))
-            self.map[self.coords[0]][self.coords[1]] = 'I'
-            self.path = self.bfs()
-        
-        if self.frame % self.mass == 0:
-            y,x = self.path.pop()
-            print(x,y)
-            self.x = x * TILESIZE
-            self.y = y * TILESIZE
-            self.rect.x = self.x
-            self.rect.y = self.y
-            self.coords = (x,y)
-            self.map[x][y] = 'I'
-        self.frame+=1
-
-    def bfs(self):
-        x = 0
-        y = 0
-        while True:
-            x = random.randrange(TM_X)
-            y = random.randrange(TM_Y)
-
-            if self.map[x][y] == '.':
-                self.map[x][y] = 'X'
-                self.goal = (x,y)
-                break
-
-        directions = [(-1,0), (1,0), (0, -1), (0, 1)]
-        cur_x, cur_y = -1, -1
-        tar_x, tar_y = -1, -1
-        for i in range(TM_X):
-            for j in range(TM_Y):
-                if self.map[j][i] == 'I':
-                    cur_x, cur_y = i, j
-                if self.map[j] [i] == 'X':
-                    tar_x, tar_y = i, j
-        start = Node(cur_x, cur_y, 0)
-        visited = [[cur_x, cur_y]]
-        queue = [start]
-        while queue:
-            cur_node = queue.pop(0)
-            x, y = cur_node.get_coords()
-            if x == tar_x and y == tar_y:
-                path = []
-                while True:
-                    path.append(cur_node.get_coords())
-                    cur_node = cur_node.get_prev()
-                    if cur_node == 0:
-
-                        return path
-            for d in directions:
-                if self.map[x+d[0]][y+d[1]] !='W' and [x+d[0], y+d[1]] not in visited:
-                    n = Node(x+d[0], y+d[1], cur_node)
-                    visited.append([x+d[0], y+d[1]])
-                    queue.append(n)
-
     def animate(self):
         if self.facing == 'right':
             self.image = self.game.ghost_spritesheet.get_sprite(0,128, self.width, self.height)
@@ -362,6 +308,8 @@ class Inky(Ghost):
             
         if self.facing == 'up':
             self.image = self.game.ghost_spritesheet.get_sprite(96,128, self.width, self.height)
+        
+        self.movement('I')
 
 class Clyde(Ghost):
     def __init__(self, game, x, y):
@@ -377,66 +325,6 @@ class Clyde(Ghost):
         self.rect.y = self.y
         self.coords = (12,9)
 
-    def movement(self):
-        if not self.path:
-            self.map.clear()
-            for row in WALLS[:]:
-                self.map.append(list(row))
-            self.map[self.coords[0]][self.coords[1]] = 'C'
-            self.path = self.bfs()
-        
-        if self.frame % self.mass == 0:
-            y,x = self.path.pop()
-            print(x,y)
-            self.x = x * TILESIZE
-            self.y = y * TILESIZE
-            self.rect.x = self.x
-            self.rect.y = self.y
-            self.coords = (x,y)
-            self.map[x][y] = 'C'
-        self.frame+=1
-
-    def bfs(self):
-        x = 0
-        y = 0
-        while True:
-            x = random.randrange(TM_X)
-            y = random.randrange(TM_Y)
-
-            if self.map[x][y] == '.':
-                self.map[x][y] = 'X'
-                self.goal = (x,y)
-                break
-
-        directions = [(-1,0), (1,0), (0, -1), (0, 1)]
-        cur_x, cur_y = -1, -1
-        tar_x, tar_y = -1, -1
-        for i in range(TM_X):
-            for j in range(TM_Y):
-                if self.map[j][i] == 'C':
-                    cur_x, cur_y = i, j
-                if self.map[j] [i] == 'X':
-                    tar_x, tar_y = i, j
-        start = Node(cur_x, cur_y, 0)
-        visited = [[cur_x, cur_y]]
-        queue = [start]
-        while queue:
-            cur_node = queue.pop(0)
-            x, y = cur_node.get_coords()
-            if x == tar_x and y == tar_y:
-                path = []
-                while True:
-                    path.append(cur_node.get_coords())
-                    cur_node = cur_node.get_prev()
-                    if cur_node == 0:
-
-                        return path
-            for d in directions:
-                if self.map[x+d[0]][y+d[1]] !='W' and [x+d[0], y+d[1]] not in visited:
-                    n = Node(x+d[0], y+d[1], cur_node)
-                    visited.append([x+d[0], y+d[1]])
-                    queue.append(n)
-
 
     def animate(self):
         if self.facing == 'right':
@@ -450,7 +338,7 @@ class Clyde(Ghost):
 
         if self.facing == 'up':
             self.image = self.game.ghost_spritesheet.get_sprite(96,160, self.width, self.height)
-
+        self.movement('C')
 
 
 
@@ -469,66 +357,6 @@ class Pinky(Ghost):
         self.coords = (10, 9)
 
 
-    def movement(self):
-        if not self.path:
-            self.map.clear()
-            for row in WALLS[:]:
-                self.map.append(list(row))
-            self.map[self.coords[0]][self.coords[1]] = 'P'
-            self.path = self.bfs()
-        
-        if self.frame % self.mass == 0:
-            y,x = self.path.pop()
-            print(x,y)
-            self.x = x * TILESIZE
-            self.y = y * TILESIZE
-            self.rect.x = self.x
-            self.rect.y = self.y
-            self.coords = (x,y)
-            self.map[x][y] = 'P'
-        self.frame+=1
-
-    def bfs(self):
-        x = 0
-        y = 0
-        while True:
-            x = random.randrange(TM_X)
-            y = random.randrange(TM_Y)
-
-            if self.map[x][y] == '.':
-                self.map[x][y] = 'X'
-                self.goal = (x,y)
-                break
-
-        directions = [(-1,0), (1,0), (0, -1), (0, 1)]
-        cur_x, cur_y = -1, -1
-        tar_x, tar_y = -1, -1
-        for i in range(TM_X):
-            for j in range(TM_Y):
-                if self.map[j][i] == 'P':
-                    cur_x, cur_y = i, j
-                if self.map[j] [i] == 'X':
-                    tar_x, tar_y = i, j
-        start = Node(cur_x, cur_y, 0)
-        visited = [[cur_x, cur_y]]
-        queue = [start]
-        while queue:
-            cur_node = queue.pop(0)
-            x, y = cur_node.get_coords()
-            if x == tar_x and y == tar_y:
-                path = []
-                while True:
-                    path.append(cur_node.get_coords())
-                    cur_node = cur_node.get_prev()
-                    if cur_node == 0:
-
-                        return path
-            for d in directions:
-                if self.map[x+d[0]][y+d[1]] !='W' and [x+d[0], y+d[1]] not in visited:
-                    n = Node(x+d[0], y+d[1], cur_node)
-                    visited.append([x+d[0], y+d[1]])
-                    queue.append(n)
-
 
     def animate(self):
         if self.facing == 'right':
@@ -542,6 +370,8 @@ class Pinky(Ghost):
 
         if self.facing == 'up':
             self.image = self.game.ghost_spritesheet.get_sprite(96,192, self.width, self.height)
+        self.movement('P')
+
 
 class Block(pg.sprite.Sprite):
     def __init__(self, game, x, y):
