@@ -1,4 +1,3 @@
-#Node used for bfs search for the ghosts
 class Node:
     def __init__(self, x, y, prev=0):
         self.x = x

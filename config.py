@@ -1,5 +1,3 @@
-#file with all character and level settings
-
 WINDOW_WIDTH = 640
 WINDOW_HEIGHT = 640
 TILESIZE = 32
@@ -28,7 +26,7 @@ TILEMAP = [
 'WWWW.WWW.W.WWWWWWWWW',
 'WWWW...........WWWWW',
 'WWWW.WWWW-WWWW.WWWWW',
-'W....WI-B-P-CW.....W',
+'W....WI.B.P.CW.....W',
 'W.WWWWWWWWWWWWWWWW.W',
 'W.WWW..........WWW.W',
 'W.....WWWWWWWW.....W',

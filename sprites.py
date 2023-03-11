@@ -6,7 +6,6 @@ from node import *
 
 
 class Spritesheet:
-    #class that helps find the sprite individually
     def __init__(self, file):
         self.sheet = pg.image.load(file).convert()
 
@@ -19,12 +18,14 @@ class Spritesheet:
 
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
-        #stars the player giving defailt values
         self.game = game
         self._layer = PLAYER_LAYER
 
         self.groups = self.game.all_sprites, self.game.pacman
         pg.sprite.Sprite.__init__(self, self.groups)
+
+        #self.groups = self.game.all_sprites
+        #pg.sprite.Sprite.__init__(self, self.groups)
 
         self.x = x * TILESIZE
         self.y = y * TILESIZE
@@ -41,7 +42,7 @@ class Player(pg.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
 
-        #animations for the player
+        
         self.left = [self.game.pacman_spritesheet.get_sprite(0,0, self.width, self.height), 
                     self.game.pacman_spritesheet.get_sprite(32*2,32, self.width, self.height),
                     self.game.pacman_spritesheet.get_sprite(32*3,32, self.width, self.height), 
@@ -63,7 +64,6 @@ class Player(pg.sprite.Sprite):
                     self.game.pacman_spritesheet.get_sprite(0,64, self.width, self.height) ]
 
     def update(self):
-        #updates the player position and their rectangles
         self.movement()
         self.animate()
         self.collide_enemy()
@@ -77,7 +77,6 @@ class Player(pg.sprite.Sprite):
         self.y_change = 0
         
     def movement(self):
-        #finds the keys player pressed and moves accordingly
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT]:
             self.x_change -=SPEED
@@ -94,7 +93,7 @@ class Player(pg.sprite.Sprite):
 
 
     def collide_blocks(self, direction):
-        #checks if the player hits a block and stops the movement
+        
         hits = pg.sprite.spritecollide(self, self.game.blocks, False)
         if direction == 'y':
             hits = pg.sprite.spritecollide(self, self.game.blocks, False)
@@ -112,7 +111,6 @@ class Player(pg.sprite.Sprite):
                     self.rect.x = hits[0].rect.right
 
     def collide_enemy(self):
-        #if the player hits an enemy, the game stops running
         hits = pg.sprite.spritecollide(self, self.game.ghosts, False)
         if hits:
             #maybe game over screen in future
@@ -121,7 +119,7 @@ class Player(pg.sprite.Sprite):
     
 
     def animate(self):
-        #makes the pacman character move mouth
+
         if self.facing == 'left':
             self.image = self.left[math.floor(self.frame)]
             self.frame+=0.2
@@ -147,7 +145,6 @@ class Player(pg.sprite.Sprite):
                 self.frame = 0
 
 class Ghost(pg.sprite.Sprite):
-    #not used, only for template inheritence
     def __init__(self):
         self._layer = GHOST_LAYER
         self.width = TILESIZE
@@ -166,19 +163,18 @@ class Ghost(pg.sprite.Sprite):
 
     def update(self):
         self.animate()
+        #self.movement()
         self.rect.x+=self.x_change
         self.rect.y+=self.y_change
         self.x_change = 0
         self.y_change = 0
     
     def valid(self, x, y):
-        #if a square is valid or not
         if x >=0 and x <=TM_X-1 and y >=0 and y <= TM_Y-1 and self.map[x][y] !='W':
             return True
         return False
         
     def change_face(self, x, y):
-        #determines the direction the character is facing
         if x < self.coords[0]:
             self.facing = 'left'
         elif x > self.coords[0]:
@@ -189,7 +185,6 @@ class Ghost(pg.sprite.Sprite):
             self.facing = 'down'
     
     def bfs(self, letter):
-        #finds the optimal path for the ghost using breadth first search
         x = 0
         y = 0
         while True:
@@ -230,8 +225,6 @@ class Ghost(pg.sprite.Sprite):
                     queue.append(n)
 
     def movement(self, letter):
-        #if a path is not made or empty, create new path using bfs
-        # move the ghost every mass frames
         if not self.path:
             self.map.clear()
             for row in WALLS[:]:
@@ -254,9 +247,7 @@ class Ghost(pg.sprite.Sprite):
 
 
 class Blinky(Ghost):
-    #all ghosts are the same, just slightly different values
     def __init__(self, game, x, y):
-        #overrides the init for the 
         super().__init__()
         self.game = game
         self.groups = self.game.all_sprites, self.game.ghosts
@@ -304,6 +295,7 @@ class Inky(Ghost):
         self.rect.y = self.y
         self.coords = (6,9)
 
+
     def animate(self):
         if self.facing == 'right':
             self.image = self.game.ghost_spritesheet.get_sprite(0,128, self.width, self.height)
@@ -316,6 +308,7 @@ class Inky(Ghost):
             
         if self.facing == 'up':
             self.image = self.game.ghost_spritesheet.get_sprite(96,128, self.width, self.height)
+        
         self.movement('I')
 
 class Clyde(Ghost):
@@ -396,6 +389,7 @@ class Block(pg.sprite.Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
         self.value = 1
+
 
 
 
