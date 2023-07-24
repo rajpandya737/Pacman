@@ -1,6 +1,6 @@
 # Pacman
-![image](https://github.com/RajPandya737/Pacman/assets/99134716/a8ac5b49-1f11-46e6-a1d1-994b8dbe43e6)
 
+![2023-07-24 18-50-53](https://github.com/RajPandya737/Pacman/assets/99134716/75df0f76-108a-4360-b10d-f6da149adcd2)
 ## Prerequisites
 
 Before running the program, ensure you have the following libraries installed:
