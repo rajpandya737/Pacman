@@ -3,6 +3,7 @@ from config import *
 import math
 import random
 from node import *
+import time
 
 
 class Spritesheet:
@@ -113,10 +114,83 @@ class Player(pg.sprite.Sprite):
     def collide_enemy(self):
         hits = pg.sprite.spritecollide(self, self.game.ghosts, False)
         if hits:
+            pg.mixer.music.stop()
+            pg.mixer.init()
+            sound = pg.mixer.Sound('assets/sound/PacManDeath.mp3')
+            sound.play()
+            self.death_animation()
+            time.sleep(1)
             #maybe game over screen in future
             self.game.playing = False
             self.game.running = False
-    
+
+    def death_image(self):
+        death_image = self.game.pacman_spritesheet.get_sprite(225,0, self.width, self.height)
+        black_image = self.game.pacman_spritesheet.get_sprite(213,235, self.width, self.height)
+        self.image = death_image
+        time.sleep(0.25)
+        self.game.draw()
+        self.image = black_image
+        self.game.draw()
+        time.sleep(0.25)
+
+    def death_animation(self):
+
+        self.left = [self.game.pacman_spritesheet.get_sprite(174,36, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(174,78, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(174,122, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(174,168, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(174,200, self.width, self.height) ]
+
+        self.right = [self.game.pacman_spritesheet.get_sprite(132,36, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(132,78, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(132,122, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(132,168, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(132,200, self.width, self.height) ]
+
+        self.up = [self.game.pacman_spritesheet.get_sprite(162,264, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(118,264, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(72,264, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(30,264, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(0,264, self.width, self.height) ]
+
+        self.down = [self.game.pacman_spritesheet.get_sprite(182,0, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(142,0, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(98,0, self.width, self.height), 
+                    self.game.pacman_spritesheet.get_sprite(60,0, self.width, self.height),
+                    self.game.pacman_spritesheet.get_sprite(31,0, self.width, self.height) ]
+        
+
+        
+        if self.facing == 'left':
+            for i in range(5):
+                self.image = self.left[i]
+                time.sleep(0.25)
+                self.game.draw()
+            self.death_image()
+
+
+        if self.facing == 'right':
+            for i in range(5):
+                self.image = self.right[i]
+                time.sleep(0.25)
+                self.game.draw()
+            self.death_image()
+
+        if self.facing == 'up':
+            for i in range(5):
+                self.image = self.up[i]
+                time.sleep(0.25)
+                self.game.draw()
+            self.death_image()
+
+        if self.facing == 'down':
+            for i in range(5):
+                self.image = self.down[i]
+                time.sleep(0.25)
+                self.game.draw()
+            self.death_image()
+
 
     def animate(self):
 

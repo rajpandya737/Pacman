@@ -19,7 +19,7 @@ class Game:
         self.ghost_spritesheet = Spritesheet('assets/sprites/pac_sprites.png')
         self.dot_spritesheet = Spritesheet('assets/sprites/dots.jpg')
         self.num_dots = 0
-        music = pg.mixer.music.load('assets/sprites/PacManMusic.mp3')
+        music = pg.mixer.music.load('assets/sound/PacManMusic.mp3')
         pg.mixer.music.play(-1)
 
 
