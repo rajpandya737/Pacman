@@ -299,9 +299,11 @@ class Ghost(pg.sprite.Sprite):
                     queue.append(n)
 
     def movement(self, letter):
+        level = self.game.level
+        level_hash = {1: WALLS, 2: WALLS_2, 3: WALLS_3, 4: WALLS_4, 5: WALLS_5}
         if not self.path:
             self.map.clear()
-            for row in WALLS[:]:
+            for row in level_hash[level][:]:
                 self.map.append(list(row))
             self.map[self.coords[0]][self.coords[1]] = letter
             self.path = self.bfs(letter)
@@ -489,6 +491,7 @@ class Dot(pg.sprite.Sprite):
             self.visible = False
             self.image = self.game.dot_spritesheet.get_sprite(0,0, 1, 1)
             self.game.num_dots-=1
+            print(self.game.num_dots)
 
 
 

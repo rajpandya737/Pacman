@@ -19,12 +19,14 @@ class Game:
         self.ghost_spritesheet = Spritesheet('assets/sprites/pac_sprites.png')
         self.dot_spritesheet = Spritesheet('assets/sprites/dots.jpg')
         self.num_dots = 0
+        self.level = 1
         music = pg.mixer.music.load('assets/sound/PacManMusic.mp3')
         pg.mixer.music.play(-1)
 
 
-    def new(self):
+    def new (self):
         self.playing = True
+        self.num_dots = 0
 
         self.all_sprites = pg.sprite.LayeredUpdates()
         self.pacman = pg.sprite.LayeredUpdates()
@@ -32,7 +34,8 @@ class Game:
         self.ghosts = pg.sprite.LayeredUpdates()
         self.dots = pg.sprite.LayeredUpdates()
 
-        self.createTilemap()
+        self.create_tilemap()
+
     
     def events(self):
         #gets key presses
@@ -41,10 +44,11 @@ class Game:
                 self.playing = False
                 self.running = False
                 
-
-    def createTilemap(self):
+    
+    def create_tilemap(self):
         #displays the tiles according to the map written in the config file
-        for i , row in enumerate(TILEMAP):
+        hash = {1: TILEMAP, 2:TILEMAP_2, 3:TILEMAP_3, 4:TILEMAP_4, 5: TILEMAP_5}
+        for i , row in enumerate(hash[self.level]):
             for j, col in enumerate(row):
                 if col == 'W':
                     Block(self, j, i)
@@ -61,11 +65,18 @@ class Game:
                 elif col == '.':
                     self.num_dots+=1
                     Dot(self, j, i)
+        print(self.num_dots)
     
     def check_dots(self):
         if self.num_dots == 0:
-            self.playing = False
-            self.running = False
+            self.level+=1
+            if self.level <= 5:
+                self.new()
+            else:
+                #maybe winning screen in the future
+                self.running = False
+                exit()
+        
 
     def update(self):
         self.all_sprites.update()
