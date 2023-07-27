@@ -31,7 +31,7 @@ git clone https://github.com/RajPandya737/Pacman.git
 ```
 2. Change to the project directory:
 ```bash
-cd Pacman
+cd Pacman/Pacman
 ```
 3. Run the program:
 ```bash
