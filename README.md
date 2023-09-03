@@ -13,14 +13,11 @@ Pacman is a classic arcade game developed by Namco in 1980. It has since become 
 
 ## Prerequisites
 
-Before running the program, ensure you have the following libraries installed:
-
-- Pygame
-- Numpy
+Before running the program, ensure you have pygame installed.
 You can install these libraries using `pip`, make sure python is installed on your machine:
 
 ```bash
-pip install pygame numpy
+pip install pygame
 ```
 
 ## Getting Started
