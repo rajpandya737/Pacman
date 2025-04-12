@@ -6,7 +6,6 @@ from abc import ABC
 import pygame as pg
 
 from config import (
-    BLACK,
     BLOCK_LAYER,
     DOT_LAYER,
     GHOST_LAYER,
@@ -22,18 +21,6 @@ from config import (
     WALLS_5,
 )
 from node import Node
-
-
-class Spritesheet:
-    def __init__(self, file):
-        self.sheet = pg.image.load(file).convert()
-
-    def get_sprite(self, x, y, width, height):
-        sprite = pg.Surface([width, height])
-        sprite.blit(self.sheet, (0, 0), (x, y, width, height))
-        sprite.set_colorkey(BLACK)
-        return sprite
-
 
 class Object(pg.sprite.Sprite, ABC):
     def __init__(self, game, layer, game_group, x, y):
@@ -343,7 +330,7 @@ class Ghost(Object):
                     cur_x, cur_y = i, j
                 if self.map[j][i] == "X":
                     tar_x, tar_y = i, j
-        start = Node(cur_x, cur_y, 0)
+        start = Node(cur_x, cur_y)
         visited = [[cur_x, cur_y]]
         queue = [start]
         while queue:
@@ -354,7 +341,7 @@ class Ghost(Object):
                 while True:
                     path.append(cur_node.get_coords())
                     cur_node = cur_node.get_prev()
-                    if cur_node == 0:
+                    if cur_node is None:
                         return path
             for d in directions:
                 if (

@@ -1,12 +1,16 @@
 # Node class to be recursively used in the BFS algorithm
-class Node:
-    def __init__(self, x, y, prev=0):
-        self.x = x
-        self.y = y
-        self.prev = prev
+from dataclasses import dataclass
+from typing import Optional
 
-    def get_coords(self):
+
+@dataclass
+class Node:
+    x: int
+    y: int
+    prev: Optional["Node"] = None  # Forward reference in quotes
+
+    def get_coords(self) -> list[int]:
         return [self.x, self.y]
 
-    def get_prev(self):
+    def get_prev(self) -> Optional["Node"]:
         return self.prev

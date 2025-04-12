@@ -11,7 +11,8 @@ from config import (
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
 )
-from sprites import Block, Dot, Ghost, Player, Spritesheet
+from sprites import Block, Dot, Ghost, Player
+from spritesheet import Spritesheet
 
 
 class Game:
@@ -92,6 +93,7 @@ class Game:
         self.all_sprites.draw(self.screen)
         self.clock.tick(FPS)
         pg.display.update()
+
 
     def main(self):
         while self.playing:
