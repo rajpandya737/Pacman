@@ -21,6 +21,7 @@ from config import (
     WALLS_5,
 )
 from node import Node
+from abc import ABC, abstractmethod
 
 
 class Spritesheet:
@@ -33,31 +34,41 @@ class Spritesheet:
         sprite.set_colorkey(BLACK)
         return sprite
 
-
-class Player(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
+class Object(pg.sprite.Sprite, ABC):
+    def __init__(self, game, layer, game_group, x, y):
         self.game = game
-        self._layer = PLAYER_LAYER
-
-        self.groups = self.game.all_sprites, self.game.pacman
+        self._layer = layer
+        self.groups = self.game.all_sprites, game_group
         pg.sprite.Sprite.__init__(self, self.groups)
-
         self.x = x * TILESIZE
         self.y = y * TILESIZE
-        self.width = TILESIZE - 2
-        self.height = TILESIZE - 2
-        self.facing = "right"
-        self.frame = 0
+        self.width = TILESIZE
+        self.height = TILESIZE
 
-        self.x_change = 0
-        self.y_change = 0
+        
 
+class Player(Object):
+    def __init__(self, game, x, y):
+        super().__init__(game, PLAYER_LAYER, game.pacman, x, y)
+        # we want the players dimension to be slightly smaller so 
+        # that it can fit in the blocks easier
+        
+        self.width -= 2
+        self.height -= 2
+        
         self.image = self.game.pacman_spritesheet.get_sprite(
             0, 0, self.width, self.height
         )
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+        self.facing = "right"
+        self.frame = 0
+
+        self.x_change = 0
+        self.y_change = 0
+
 
         self.left = [
             self.game.pacman_spritesheet.get_sprite(0, 0, self.width, self.height),
@@ -257,11 +268,18 @@ class Player(pg.sprite.Sprite):
                 self.frame = 0
 
 
-class Ghost(pg.sprite.Sprite):
+class Ghost(Object):
     def __init__(self, game, x, y, image_x, image_y, coords, ghost_letter):
-        self._layer = GHOST_LAYER
-        self.width = TILESIZE
-        self.height = TILESIZE
+        super().__init__(game, GHOST_LAYER, game.ghosts, x, y)
+        self.image_x = image_x
+        self.image_y = image_y
+        self.image = self.game.ghost_spritesheet.get_sprite(
+            self.image_x, self.image_y, self.width, self.height
+        )
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
         self.x_change = 0
         self.y_change = 0
         self.facing = "right"
@@ -273,19 +291,6 @@ class Ghost(pg.sprite.Sprite):
         self.map = []
         # in this case, more mass means the ghosts are slower
         self.mass = 15
-        self.game = game
-        self.groups = self.game.all_sprites, self.game.ghosts
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.image_x = image_x
-        self.image_y = image_y
-        self.image = self.game.ghost_spritesheet.get_sprite(
-            self.image_x, self.image_y, self.width, self.height
-        )
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
         self.coords = coords
         self.ghost_letter = ghost_letter
 
@@ -406,43 +411,30 @@ class Ghost(pg.sprite.Sprite):
         self.movement(self.ghost_letter)
 
 
-class Block(pg.sprite.Sprite):
+class Block(Object):
     def __init__(self, game, x, y):
-        self.game = game
-        self._layer = BLOCK_LAYER
-        self.groups = self.game.all_sprites, self.game.blocks
-        pg.sprite.Sprite.__init__(self, self.groups)
-
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
+        super().__init__(game, BLOCK_LAYER, game.blocks, x, y)
         self.image = self.game.terrain_spritesheet.get_sprite(
             0, 0, self.width, self.height
         )
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
         self.value = 1
 
 
-class Dot(pg.sprite.Sprite):
+class Dot(Object):
     def __init__(self, game, x, y):
-        self.game = game
-        self.visible = True
-        self._layer = DOT_LAYER
-        self.groups = self.game.all_sprites, self.game.dots
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
-        self.width = TILESIZE
-        self.height = TILESIZE
+        super().__init__(game, DOT_LAYER, game.dots, x, y)
         self.image = self.game.dot_spritesheet.get_sprite(
             32, 0, self.width, self.height
         )
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+        self.visible = True
 
     def update(self):
         hits = pg.sprite.spritecollide(self, self.game.pacman, False)
