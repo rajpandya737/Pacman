@@ -1,16 +1,17 @@
 import pygame as pg
+
 from config import (
-    WINDOW_WIDTH,
-    WINDOW_HEIGHT,
-    FPS,
     BLACK,
+    FPS,
     TILEMAP,
     TILEMAP_2,
     TILEMAP_3,
     TILEMAP_4,
     TILEMAP_5,
+    WINDOW_HEIGHT,
+    WINDOW_WIDTH,
 )
-from sprites import Spritesheet, Player, Block, Inky, Pinky, Blinky, Clyde, Dot
+from sprites import Block, Dot, Ghost, Player, Spritesheet
 
 
 class Game:
@@ -28,7 +29,7 @@ class Game:
         self.dot_spritesheet = Spritesheet("assets/sprites/dots.jpg")
         self.num_dots = 0
         self.level = 1
-        music = pg.mixer.music.load("assets/sound/PacManMusic.mp3")
+        pg.mixer.music.load("assets/sound/PacManMusic.mp3")
         pg.mixer.music.play(-1)
 
     def new(self):
@@ -60,14 +61,14 @@ class Game:
                     Block(self, j, i)
                 elif col == "U":
                     Player(self, j, i)
-                elif col == "I":
-                    Inky(self, j, i)
-                elif col == "P":
-                    Pinky(self, j, i)
-                elif col == "B":
-                    Blinky(self, j, i)
-                elif col == "C":
-                    Clyde(self, j, i)
+                elif col == "B": # Blinky
+                    Ghost(self, j, i, 0, 96, (8, 9), "B")
+                elif col == "I":  # Inky
+                    Ghost(self, j, i, 0, 128, (6, 9), "I")
+                elif col == "C": # Clyde
+                    Ghost(self, j, i, 0, 160, (12, 9), "C")
+                elif col == "P": # Pinky
+                    Ghost(self, j, i, 0, 192, (10, 9), "P")
                 elif col == ".":
                     self.num_dots += 1
                     Dot(self, j, i)
