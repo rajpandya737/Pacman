@@ -11,7 +11,7 @@ from config import (
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
 )
-from sprites import Blinky, Block, Clyde, Dot, Inky, Pinky, Player, Spritesheet
+from sprites import Block, Dot, Ghost, Player, Spritesheet
 
 
 class Game:
@@ -61,14 +61,18 @@ class Game:
                     Block(self, j, i)
                 elif col == "U":
                     Player(self, j, i)
-                elif col == "I":
-                    Inky(self, j, i)
-                elif col == "P":
-                    Pinky(self, j, i)
                 elif col == "B":
-                    Blinky(self, j, i)
+                    # Blinky(self, j, i)
+                    Ghost(self, j, i, 0, 96, (8, 9), "B")
+                elif col == "I": # Inky
+                    # Inky(self, j, i)
+                    Ghost(self, j, i, 0, 128, (6, 9), "I")
                 elif col == "C":
-                    Clyde(self, j, i)
+                    # Clyde(self, j, i)
+                    Ghost(self, j, i, 0, 160, (12, 9), "C")
+                elif col == "P":
+                    # Pinky(self, j, i)
+                    Ghost(self, j, i, 0, 192, (10, 9), "P")
                 elif col == ".":
                     self.num_dots += 1
                     Dot(self, j, i)

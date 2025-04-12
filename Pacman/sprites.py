@@ -262,7 +262,7 @@ class Player(pg.sprite.Sprite):
 
 
 class Ghost(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, image_x, image_y, coords, ghost_letter):
         self._layer = GHOST_LAYER
         self.width = TILESIZE
         self.height = TILESIZE
@@ -282,6 +282,17 @@ class Ghost(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.x = x * TILESIZE
         self.y = y * TILESIZE
+        self.image_x = image_x
+        self.image_y = image_y
+        self.image = self.game.ghost_spritesheet.get_sprite(
+            self.image_x, self.image_y, self.width, self.height
+        )
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        self.coords = coords
+        self.ghost_letter = ghost_letter
+
 
     def update(self):
         self.animate()
@@ -376,152 +387,30 @@ class Ghost(pg.sprite.Sprite):
             self.map[x][y] = letter
         self.frame += 1
 
-
-class Blinky(Ghost):
-    def __init__(self, game, x, y):
-        super().__init__(game, x, y)
-        self.image_x = 0
-        self.image_y = 96
-        self.image = self.game.ghost_spritesheet.get_sprite(
-            self.image_x, self.image_y, self.width, self.height
-        )
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
-        self.coords = (8, 9)
-
     def animate(self):
         if self.facing == "right":
             self.image = self.game.ghost_spritesheet.get_sprite(
-                0, 96, self.width, self.height
+                self.image_x, self.image_y, self.width, self.height
             )
 
         if self.facing == "left":
             self.image = self.game.ghost_spritesheet.get_sprite(
-                32, 96, self.width, self.height
+                self.image_x + 32, self.image_y, self.width, self.height
             )
 
         if self.facing == "down":
             self.image = self.game.ghost_spritesheet.get_sprite(
-                64, 96, self.width, self.height
+                self.image_x + 64, self.image_y, self.width, self.height
             )
 
         if self.facing == "up":
             self.image = self.game.ghost_spritesheet.get_sprite(
-                96, 96, self.width, self.height
+                self.image_x + 96, self.image_y, self.width, self.height
             )
-
-        self.movement("B")
-
-
-class Inky(Ghost):
-    def __init__(self, game, x, y):
-        super().__init__(game, x, y)
-        self.image_x = 0
-        self.image_y = 128
-        self.image = self.game.ghost_spritesheet.get_sprite(
-            self.image_x, self.image_y, self.width, self.height
-        )
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
-        self.coords = (6, 9)
-
-    def animate(self):
-        if self.facing == "right":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                0, 128, self.width, self.height
-            )
-
-        if self.facing == "left":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                32, 128, self.width, self.height
-            )
-
-        if self.facing == "down":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                64, 128, self.width, self.height
-            )
-
-        if self.facing == "up":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                96, 128, self.width, self.height
-            )
-
-        self.movement("I")
+        
+        self.movement(self.ghost_letter)
 
 
-class Clyde(Ghost):
-    def __init__(self, game, x, y):
-        super().__init__(game, x, y)
-        self.image_x = 0
-        self.image_y = 160
-        self.image = self.game.ghost_spritesheet.get_sprite(
-            self.image_x, self.image_y, self.width, self.height
-        )
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
-        self.coords = (12, 9)
-
-    def animate(self):
-        if self.facing == "right":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                0, 160, self.width, self.height
-            )
-
-        if self.facing == "left":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                32, 160, self.width, self.height
-            )
-
-        if self.facing == "down":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                64, 160, self.width, self.height
-            )
-
-        if self.facing == "up":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                96, 160, self.width, self.height
-            )
-
-        self.movement("C")
-
-
-class Pinky(Ghost):
-    def __init__(self, game, x, y):
-        super().__init__(game, x, y)
-        self.image_x = 0
-        self.image_y = 192
-        self.image = self.game.ghost_spritesheet.get_sprite(
-            self.image_x, self.image_y, self.width, self.height
-        )
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
-        self.coords = (10, 9)
-
-    def animate(self):
-        if self.facing == "right":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                0, 192, self.width, self.height
-            )
-
-        if self.facing == "left":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                32, 192, self.width, self.height
-            )
-
-        if self.facing == "down":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                64, 192, self.width, self.height
-            )
-
-        if self.facing == "up":
-            self.image = self.game.ghost_spritesheet.get_sprite(
-                96, 192, self.width, self.height
-            )
-        self.movement("P")
 
 
 class Block(pg.sprite.Sprite):
