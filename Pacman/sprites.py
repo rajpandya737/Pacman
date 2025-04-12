@@ -1,24 +1,26 @@
+import math
+import random
+import time
+
 import pygame as pg
+
 from config import (
-    TILESIZE,
     BLACK,
-    TM_X,
-    TM_Y,
-    SPEED,
-    PLAYER_LAYER,
     BLOCK_LAYER,
     DOT_LAYER,
     GHOST_LAYER,
+    PLAYER_LAYER,
+    SPEED,
+    TILESIZE,
+    TM_X,
+    TM_Y,
     WALLS,
     WALLS_2,
     WALLS_3,
     WALLS_4,
     WALLS_5,
 )
-import math
-import random
 from node import Node
-import time
 
 
 class Spritesheet:
@@ -260,7 +262,7 @@ class Player(pg.sprite.Sprite):
 
 
 class Ghost(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, game, x, y):
         self._layer = GHOST_LAYER
         self.width = TILESIZE
         self.height = TILESIZE
@@ -275,6 +277,11 @@ class Ghost(pg.sprite.Sprite):
         self.map = []
         # in this case, more mass means the ghosts are slower
         self.mass = 15
+        self.game = game
+        self.groups = self.game.all_sprites, self.game.ghosts
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
 
     def update(self):
         self.animate()
@@ -372,14 +379,11 @@ class Ghost(pg.sprite.Sprite):
 
 class Blinky(Ghost):
     def __init__(self, game, x, y):
-        super().__init__()
-        self.game = game
-        self.groups = self.game.all_sprites, self.game.ghosts
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
+        super().__init__(game, x, y)
+        self.image_x = 0
+        self.image_y = 96
         self.image = self.game.ghost_spritesheet.get_sprite(
-            0, 96, self.width, self.height
+            self.image_x, self.image_y, self.width, self.height
         )
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -412,14 +416,11 @@ class Blinky(Ghost):
 
 class Inky(Ghost):
     def __init__(self, game, x, y):
-        super().__init__()
-        self.game = game
-        self.groups = self.game.all_sprites, self.game.ghosts
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
+        super().__init__(game, x, y)
+        self.image_x = 0
+        self.image_y = 128
         self.image = self.game.ghost_spritesheet.get_sprite(
-            0, 128, self.width, self.height
+            self.image_x, self.image_y, self.width, self.height
         )
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -452,14 +453,11 @@ class Inky(Ghost):
 
 class Clyde(Ghost):
     def __init__(self, game, x, y):
-        super().__init__()
-        self.game = game
-        self.groups = self.game.all_sprites, self.game.ghosts
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
+        super().__init__(game, x, y)
+        self.image_x = 0
+        self.image_y = 160
         self.image = self.game.ghost_spritesheet.get_sprite(
-            0, 160, self.width, self.height
+            self.image_x, self.image_y, self.width, self.height
         )
         self.rect = self.image.get_rect()
         self.rect.x = self.x
@@ -486,19 +484,17 @@ class Clyde(Ghost):
             self.image = self.game.ghost_spritesheet.get_sprite(
                 96, 160, self.width, self.height
             )
+
         self.movement("C")
 
 
 class Pinky(Ghost):
     def __init__(self, game, x, y):
-        super().__init__()
-        self.game = game
-        self.groups = self.game.all_sprites, self.game.ghosts
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.x = x * TILESIZE
-        self.y = y * TILESIZE
+        super().__init__(game, x, y)
+        self.image_x = 0
+        self.image_y = 192
         self.image = self.game.ghost_spritesheet.get_sprite(
-            0, 192, self.width, self.height
+            self.image_x, self.image_y, self.width, self.height
         )
         self.rect = self.image.get_rect()
         self.rect.x = self.x

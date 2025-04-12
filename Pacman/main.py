@@ -1,16 +1,17 @@
 import pygame as pg
+
 from config import (
-    WINDOW_WIDTH,
-    WINDOW_HEIGHT,
-    FPS,
     BLACK,
+    FPS,
     TILEMAP,
     TILEMAP_2,
     TILEMAP_3,
     TILEMAP_4,
     TILEMAP_5,
+    WINDOW_HEIGHT,
+    WINDOW_WIDTH,
 )
-from sprites import Spritesheet, Player, Block, Inky, Pinky, Blinky, Clyde, Dot
+from sprites import Blinky, Block, Clyde, Dot, Inky, Pinky, Player, Spritesheet
 
 
 class Game:
@@ -28,7 +29,7 @@ class Game:
         self.dot_spritesheet = Spritesheet("assets/sprites/dots.jpg")
         self.num_dots = 0
         self.level = 1
-        music = pg.mixer.music.load("assets/sound/PacManMusic.mp3")
+        pg.mixer.music.load("assets/sound/PacManMusic.mp3")
         pg.mixer.music.play(-1)
 
     def new(self):
