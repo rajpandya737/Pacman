@@ -42,9 +42,6 @@ class Player(pg.sprite.Sprite):
         self.groups = self.game.all_sprites, self.game.pacman
         pg.sprite.Sprite.__init__(self, self.groups)
 
-        # self.groups = self.game.all_sprites
-        # pg.sprite.Sprite.__init__(self, self.groups)
-
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         self.width = TILESIZE - 2
@@ -156,7 +153,6 @@ class Player(pg.sprite.Sprite):
             sound.play()
             self.death_animation()
             time.sleep(1)
-            # maybe game over screen in future
             self.game.playing = False
             self.game.running = False
 
@@ -293,7 +289,6 @@ class Ghost(pg.sprite.Sprite):
         self.coords = coords
         self.ghost_letter = ghost_letter
 
-
     def update(self):
         self.animate()
         # self.movement()
@@ -407,10 +402,8 @@ class Ghost(pg.sprite.Sprite):
             self.image = self.game.ghost_spritesheet.get_sprite(
                 self.image_x + 96, self.image_y, self.width, self.height
             )
-        
+
         self.movement(self.ghost_letter)
-
-
 
 
 class Block(pg.sprite.Sprite):
