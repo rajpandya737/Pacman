@@ -1,6 +1,7 @@
 import math
 import random
 import time
+from abc import ABC
 
 import pygame as pg
 
@@ -21,7 +22,6 @@ from config import (
     WALLS_5,
 )
 from node import Node
-from abc import ABC, abstractmethod
 
 
 class Spritesheet:
@@ -34,6 +34,7 @@ class Spritesheet:
         sprite.set_colorkey(BLACK)
         return sprite
 
+
 class Object(pg.sprite.Sprite, ABC):
     def __init__(self, game, layer, game_group, x, y):
         self.game = game
@@ -45,17 +46,16 @@ class Object(pg.sprite.Sprite, ABC):
         self.width = TILESIZE
         self.height = TILESIZE
 
-        
 
 class Player(Object):
     def __init__(self, game, x, y):
         super().__init__(game, PLAYER_LAYER, game.pacman, x, y)
-        # we want the players dimension to be slightly smaller so 
+        # we want the players dimension to be slightly smaller so
         # that it can fit in the blocks easier
-        
+
         self.width -= 2
         self.height -= 2
-        
+
         self.image = self.game.pacman_spritesheet.get_sprite(
             0, 0, self.width, self.height
         )
@@ -68,7 +68,6 @@ class Player(Object):
 
         self.x_change = 0
         self.y_change = 0
-
 
         self.left = [
             self.game.pacman_spritesheet.get_sprite(0, 0, self.width, self.height),
