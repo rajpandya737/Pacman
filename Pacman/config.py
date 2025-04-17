@@ -1,4 +1,5 @@
 # Configurations for the game
+from enum import Enum
 
 # Tile/Window size
 WINDOW_WIDTH = 640
@@ -23,6 +24,31 @@ TM_X = 20
 TM_Y = 20
 
 SPEED = 3  # Speed of the player
+
+
+class Direction(Enum):
+    RIGHT = "right"
+    LEFT = "left"
+    UP = "up"
+    DOWN = "down"
+
+
+class GameLevel(Enum):
+    LEVEL1 = 1
+    LEVEL2 = 2
+    LEVEL3 = 3
+    LEVEL4 = 4
+    LEVEL5 = 5
+
+class SpriteType(Enum):
+    PINKY = "P"
+    BLINKY = "B"
+    CLYDE = "C"
+    INKY = "I"
+    DOT = "."
+    PACMAN = "U"
+    WALL = "W"
+
 
 # Tilemap for each level
 TILEMAP = [

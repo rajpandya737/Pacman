@@ -20,15 +20,9 @@ from config import (
     WALLS_3,
     WALLS_4,
     WALLS_5,
+    Direction,
 )
 from node import Node
-
-
-class Direction(Enum):
-    RIGHT = "right"
-    LEFT = "left"
-    UP = "up"
-    DOWN = "down"
 
 
 class Object(pg.sprite.Sprite, ABC):
@@ -121,19 +115,16 @@ class Player(Object):
     def movement(self):
         keys = pg.key.get_pressed()
         directions = {
-            pg.K_LEFT:  (-SPEED, 0, Direction.LEFT),
+            pg.K_LEFT: (-SPEED, 0, Direction.LEFT),
             pg.K_RIGHT: (SPEED, 0, Direction.RIGHT),
-            pg.K_UP:    (0, -SPEED, Direction.UP),
-            pg.K_DOWN:  (0, SPEED, Direction.DOWN)
+            pg.K_UP: (0, -SPEED, Direction.UP),
+            pg.K_DOWN: (0, SPEED, Direction.DOWN),
         }
-
         for key, (dx, dy, facing) in directions.items():
             if keys[key]:
                 self.x_change += dx
                 self.y_change += dy
                 self.facing = facing
-
-
 
     def collide_blocks_y(self):
         hits = pg.sprite.spritecollide(self, self.game.blocks, False)
@@ -178,10 +169,10 @@ class Player(Object):
 
     def death_animation(self):
         sprite_data = {
-            Direction.LEFT:  (174, [36, 78, 122, 168, 200]),
+            Direction.LEFT: (174, [36, 78, 122, 168, 200]),
             Direction.RIGHT: (132, [36, 78, 122, 168, 200]),
-            Direction.UP:    ([162, 118, 72, 30, 0], 264),
-            Direction.DOWN:  ([182, 142, 98, 60, 31], 0),
+            Direction.UP: ([162, 118, 72, 30, 0], 264),
+            Direction.DOWN: ([182, 142, 98, 60, 31], 0),
         }
 
         spritesheet = self.game.pacman_spritesheet
@@ -195,7 +186,7 @@ class Player(Object):
             frames = [spritesheet.get_sprite(x, y, self.width, self.height) for x in xs]
 
         else:
-            return 
+            return
 
         for frame in frames:
             self.image = frame
@@ -204,13 +195,12 @@ class Player(Object):
 
         self.death_image()
 
-
     def animate(self):
         map = {
             Direction.LEFT: self.left,
             Direction.RIGHT: self.right,
             Direction.UP: self.up,
-            Direction.DOWN: self.down
+            Direction.DOWN: self.down,
         }
 
         self.image = map[self.facing][math.floor(self.frame)]
@@ -255,15 +245,13 @@ class Ghost(Object):
         self.y_change = 0
 
     def valid(self, x, y):
-        if (
+        return (
             x >= 0
             and x <= TM_X - 1
             and y >= 0
             and y <= TM_Y - 1
             and self.map[x][y] != "W"
-        ):
-            return True
-        return False
+        )
 
     def change_face(self, x, y):
         if x < self.coords[0]:
