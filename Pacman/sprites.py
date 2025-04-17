@@ -111,9 +111,9 @@ class Player(Object):
         self.collide_enemy()
 
         self.rect.y += self.y_change
-        self.collide_blocks("y")
+        self.collide_blocks_y()
         self.rect.x += self.x_change
-        self.collide_blocks("x")
+        self.collide_blocks_x()
 
         self.x_change = 0
         self.y_change = 0
@@ -134,22 +134,22 @@ class Player(Object):
                 self.facing = facing
 
 
-    def collide_blocks(self, direction):
+
+    def collide_blocks_y(self):
         hits = pg.sprite.spritecollide(self, self.game.blocks, False)
-        if direction == "y":
-            hits = pg.sprite.spritecollide(self, self.game.blocks, False)
-            if hits:
-                if self.y_change > 0:
-                    self.rect.y = hits[0].rect.top - self.rect.height
-                if self.y_change < 0:
-                    self.rect.y = hits[0].rect.bottom
-        if direction == "x":
-            hits = pg.sprite.spritecollide(self, self.game.blocks, False)
-            if hits:
-                if self.x_change > 0:
-                    self.rect.x = hits[0].rect.left - self.rect.width
-                if self.x_change < 0:
-                    self.rect.x = hits[0].rect.right
+        if hits:
+            if self.y_change > 0:
+                self.rect.y = hits[0].rect.top - self.rect.height
+            if self.y_change < 0:
+                self.rect.y = hits[0].rect.bottom
+
+    def collide_blocks_x(self):
+        hits = pg.sprite.spritecollide(self, self.game.blocks, False)
+        if hits:
+            if self.x_change > 0:
+                self.rect.x = hits[0].rect.left - self.rect.width
+            if self.x_change < 0:
+                self.rect.x = hits[0].rect.right
 
     def collide_enemy(self):
         if pg.sprite.spritecollide(self, self.game.ghosts, False):
