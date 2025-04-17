@@ -10,8 +10,7 @@ from config import (
     TILEMAP_5,
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
-    GameLevel,
-    SpriteType
+    SpriteType,
 )
 from sprites import Block, Dot, Ghost, Player
 from spritesheet import Spritesheet
@@ -57,14 +56,14 @@ class Game:
 
     def create_tilemap(self):
         # displays the tiles according to the map written in the config file
-        hash = {
+        level_dict = {
             1: TILEMAP,
             2: TILEMAP_2,
             3: TILEMAP_3,
             4: TILEMAP_4,
-            5: TILEMAP_5
+            5: TILEMAP_5,
         }
-        for i, row in enumerate(hash[self.level]):
+        for i, row in enumerate(level_dict[self.level]):
             for j, col in enumerate(row):
                 if col == SpriteType.WALL.value:
                     Block(self, j, i)

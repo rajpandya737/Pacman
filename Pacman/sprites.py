@@ -2,7 +2,6 @@ import math
 import random
 import time
 from abc import ABC
-from enum import Enum
 
 import pygame as pg
 
