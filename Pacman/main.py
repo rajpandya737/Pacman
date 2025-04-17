@@ -10,6 +10,7 @@ from config import (
     TILEMAP_5,
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
+    SpriteType,
 )
 from sprites import Block, Dot, Ghost, Player
 from spritesheet import Spritesheet
@@ -55,22 +56,28 @@ class Game:
 
     def create_tilemap(self):
         # displays the tiles according to the map written in the config file
-        hash = {1: TILEMAP, 2: TILEMAP_2, 3: TILEMAP_3, 4: TILEMAP_4, 5: TILEMAP_5}
-        for i, row in enumerate(hash[self.level]):
+        level_dict = {
+            1: TILEMAP,
+            2: TILEMAP_2,
+            3: TILEMAP_3,
+            4: TILEMAP_4,
+            5: TILEMAP_5,
+        }
+        for i, row in enumerate(level_dict[self.level]):
             for j, col in enumerate(row):
-                if col == "W":
+                if col == SpriteType.WALL.value:
                     Block(self, j, i)
-                elif col == "U":
+                elif col == SpriteType.PACMAN.value:
                     Player(self, j, i)
-                elif col == "B":  # Blinky
-                    Ghost(self, j, i, 0, 96, (8, 9), "B")
-                elif col == "I":  # Inky
-                    Ghost(self, j, i, 0, 128, (6, 9), "I")
-                elif col == "C":  # Clyde
-                    Ghost(self, j, i, 0, 160, (12, 9), "C")
-                elif col == "P":  # Pinky
-                    Ghost(self, j, i, 0, 192, (10, 9), "P")
-                elif col == ".":
+                elif col == SpriteType.BLINKY.value:  # Blinky
+                    Ghost(self, j, i, 0, 96, (8, 9), SpriteType.BLINKY.value)
+                elif col == SpriteType.INKY.value:  # Inky
+                    Ghost(self, j, i, 0, 128, (6, 9), SpriteType.INKY.value)
+                elif col == SpriteType.CLYDE.value:  # Clyde
+                    Ghost(self, j, i, 0, 160, (12, 9), SpriteType.CLYDE.value)
+                elif col == SpriteType.PINKY.value:  # Pinky
+                    Ghost(self, j, i, 0, 192, (10, 9), SpriteType.PINKY.value)
+                elif col == SpriteType.DOT.value:
                     self.num_dots += 1
                     Dot(self, j, i)
 
@@ -93,7 +100,6 @@ class Game:
         self.all_sprites.draw(self.screen)
         self.clock.tick(FPS)
         pg.display.update()
-
 
     def main(self):
         while self.playing:

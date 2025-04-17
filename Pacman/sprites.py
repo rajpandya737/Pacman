@@ -19,8 +19,10 @@ from config import (
     WALLS_3,
     WALLS_4,
     WALLS_5,
+    Direction,
 )
 from node import Node
+
 
 class Object(pg.sprite.Sprite, ABC):
     def __init__(self, game, layer, game_group, x, y):
@@ -50,7 +52,7 @@ class Player(Object):
         self.rect.x = self.x
         self.rect.y = self.y
 
-        self.facing = "right"
+        self.facing = Direction.RIGHT
         self.frame = 0
 
         self.x_change = 0
@@ -102,48 +104,43 @@ class Player(Object):
         self.collide_enemy()
 
         self.rect.y += self.y_change
-        self.collide_blocks("y")
+        self.collide_blocks_y()
         self.rect.x += self.x_change
-        self.collide_blocks("x")
+        self.collide_blocks_x()
 
         self.x_change = 0
         self.y_change = 0
 
     def movement(self):
         keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT]:
-            self.x_change -= SPEED
-            self.facing = "left"
-        if keys[pg.K_RIGHT]:
-            self.x_change += SPEED
-            self.facing = "right"
-        if keys[pg.K_UP]:
-            self.y_change -= SPEED
-            self.facing = "up"
-        if keys[pg.K_DOWN]:
-            self.y_change += SPEED
-            self.facing = "down"
+        directions = {
+            pg.K_LEFT: (-SPEED, 0, Direction.LEFT),
+            pg.K_RIGHT: (SPEED, 0, Direction.RIGHT),
+            pg.K_UP: (0, -SPEED, Direction.UP),
+            pg.K_DOWN: (0, SPEED, Direction.DOWN),
+        }
+        for key, (dx, dy, facing) in directions.items():
+            if keys[key]:
+                self.x_change += dx
+                self.y_change += dy
+                self.facing = facing
 
-    def collide_blocks(self, direction):
+    def collide_blocks_y(self):
         hits = pg.sprite.spritecollide(self, self.game.blocks, False)
-        if direction == "y":
-            hits = pg.sprite.spritecollide(self, self.game.blocks, False)
-            if hits:
-                if self.y_change > 0:
-                    self.rect.y = hits[0].rect.top - self.rect.height
-                if self.y_change < 0:
-                    self.rect.y = hits[0].rect.bottom
-        if direction == "x":
-            hits = pg.sprite.spritecollide(self, self.game.blocks, False)
-            if hits:
-                if self.x_change > 0:
-                    self.rect.x = hits[0].rect.left - self.rect.width
-                if self.x_change < 0:
-                    self.rect.x = hits[0].rect.right
+        if hits:
+            if self.y_change > 0:
+                self.rect.y = hits[0].rect.top - self.rect.height
+            if self.y_change < 0:
+                self.rect.y = hits[0].rect.bottom
+
+    def collide_blocks_x(self):
+        if hits := pg.sprite.spritecollide(self, self.game.blocks, False):
+            self.rect.x = hits[0].rect.left - self.rect.width
+            if self.x_change < 0:
+                self.rect.x = hits[0].rect.right
 
     def collide_enemy(self):
-        hits = pg.sprite.spritecollide(self, self.game.ghosts, False)
-        if hits:
+        if pg.sprite.spritecollide(self, self.game.ghosts, False):
             pg.mixer.music.stop()
             pg.mixer.init()
             sound = pg.mixer.Sound("assets/sound/PacManDeath.mp3")
@@ -168,90 +165,42 @@ class Player(Object):
         time.sleep(0.25)
 
     def death_animation(self):
-        self.left = [
-            self.game.pacman_spritesheet.get_sprite(174, 36, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(174, 78, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(174, 122, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(174, 168, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(174, 200, self.width, self.height),
-        ]
+        sprite_data = {
+            Direction.LEFT: (174, [36, 78, 122, 168, 200]),
+            Direction.RIGHT: (132, [36, 78, 122, 168, 200]),
+            Direction.UP: ([162, 118, 72, 30, 0], 264),
+            Direction.DOWN: ([182, 142, 98, 60, 31], 0),
+        }
 
-        self.right = [
-            self.game.pacman_spritesheet.get_sprite(132, 36, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(132, 78, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(132, 122, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(132, 168, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(132, 200, self.width, self.height),
-        ]
+        spritesheet = self.game.pacman_spritesheet
+        x_new, y_new = sprite_data[self.facing]
 
-        self.up = [
-            self.game.pacman_spritesheet.get_sprite(162, 264, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(118, 264, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(72, 264, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(30, 264, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(0, 264, self.width, self.height),
-        ]
+        if self.facing == Direction.LEFT or self.facing == Direction.RIGHT:
+            frames = [spritesheet.get_sprite(x_new, y, self.width, self.height) for y in y_new]
 
-        self.down = [
-            self.game.pacman_spritesheet.get_sprite(182, 0, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(142, 0, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(98, 0, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(60, 0, self.width, self.height),
-            self.game.pacman_spritesheet.get_sprite(31, 0, self.width, self.height),
-        ]
+        elif self.facing == Direction.UP or self.facing == Direction.DOWN:
+            frames = [spritesheet.get_sprite(x, y_new, self.width, self.height) for x in x_new]
 
-        if self.facing == "left":
-            for i in range(5):
-                self.image = self.left[i]
-                time.sleep(0.25)
-                self.game.draw()
-            self.death_image()
+        for frame in frames:
+            self.image = frame
+            time.sleep(0.25)
+            self.game.draw()
 
-        if self.facing == "right":
-            for i in range(5):
-                self.image = self.right[i]
-                time.sleep(0.25)
-                self.game.draw()
-            self.death_image()
-
-        if self.facing == "up":
-            for i in range(5):
-                self.image = self.up[i]
-                time.sleep(0.25)
-                self.game.draw()
-            self.death_image()
-
-        if self.facing == "down":
-            for i in range(5):
-                self.image = self.down[i]
-                time.sleep(0.25)
-                self.game.draw()
-            self.death_image()
+        self.death_image()
 
     def animate(self):
-        if self.facing == "left":
-            self.image = self.left[math.floor(self.frame)]
-            self.frame += 0.2
-            if self.frame > 3.6:
-                self.frame = 0
+        dir_map = {
+            Direction.LEFT: self.left,
+            Direction.RIGHT: self.right,
+            Direction.UP: self.up,
+            Direction.DOWN: self.down,
+        }
 
-        if self.facing == "right":
-            self.image = self.right[math.floor(self.frame)]
-            self.frame += 0.2
-            if self.frame > 3.6:
-                self.frame = 0
+        self.image = dir_map[self.facing][math.floor(self.frame)]
+        self.frame += 0.2
 
-        if self.facing == "up":
-            self.image = self.up[math.floor(self.frame)]
-            self.frame += 0.2
-            if self.frame > 3.6:
-                self.frame = 0
-
-        if self.facing == "down":
-            self.image = self.down[math.floor(self.frame)]
-            self.frame += 0.2
-            if self.frame > 3.6:
-                self.frame = 0
+        if self.frame > 3.6:
+            self.frame = 0
 
 
 class Ghost(Object):
@@ -268,7 +217,7 @@ class Ghost(Object):
 
         self.x_change = 0
         self.y_change = 0
-        self.facing = "right"
+        self.facing = Direction.RIGHT
         self.move_loop = 0
         self.frame = 1
         self.path = []
@@ -289,25 +238,23 @@ class Ghost(Object):
         self.y_change = 0
 
     def valid(self, x, y):
-        if (
+        return (
             x >= 0
             and x <= TM_X - 1
             and y >= 0
             and y <= TM_Y - 1
             and self.map[x][y] != "W"
-        ):
-            return True
-        return False
+        )
 
     def change_face(self, x, y):
         if x < self.coords[0]:
-            self.facing = "left"
+            self.facing = Direction.LEFT
         elif x > self.coords[0]:
-            self.facing = "right"
+            self.facing = Direction.RIGHT
         elif y < self.coords[1]:
-            self.facing = "up"
+            self.facing = Direction.UP
         elif y > self.coords[1]:
-            self.facing = "down"
+            self.facing = Direction.DOWN
 
     def bfs(self, letter):
         x = 0
@@ -374,22 +321,22 @@ class Ghost(Object):
         self.frame += 1
 
     def animate(self):
-        if self.facing == "right":
+        if self.facing == Direction.RIGHT:
             self.image = self.game.ghost_spritesheet.get_sprite(
                 self.image_x, self.image_y, self.width, self.height
             )
 
-        if self.facing == "left":
+        if self.facing == Direction.LEFT:
             self.image = self.game.ghost_spritesheet.get_sprite(
                 self.image_x + 32, self.image_y, self.width, self.height
             )
 
-        if self.facing == "down":
+        if self.facing == Direction.DOWN:
             self.image = self.game.ghost_spritesheet.get_sprite(
                 self.image_x + 64, self.image_y, self.width, self.height
             )
 
-        if self.facing == "up":
+        if self.facing == Direction.UP:
             self.image = self.game.ghost_spritesheet.get_sprite(
                 self.image_x + 96, self.image_y, self.width, self.height
             )
