@@ -134,10 +134,8 @@ class Player(Object):
                 self.rect.y = hits[0].rect.bottom
 
     def collide_blocks_x(self):
-        hits = pg.sprite.spritecollide(self, self.game.blocks, False)
-        if hits:
-            if self.x_change > 0:
-                self.rect.x = hits[0].rect.left - self.rect.width
+        if hits := pg.sprite.spritecollide(self, self.game.blocks, False):
+            self.rect.x = hits[0].rect.left - self.rect.width
             if self.x_change < 0:
                 self.rect.x = hits[0].rect.right
 
@@ -175,17 +173,13 @@ class Player(Object):
         }
 
         spritesheet = self.game.pacman_spritesheet
+        x_new, y_new = sprite_data[self.facing]
 
         if self.facing == Direction.LEFT or self.facing == Direction.RIGHT:
-            x, ys = sprite_data[self.facing]
-            frames = [spritesheet.get_sprite(x, y, self.width, self.height) for y in ys]
+            frames = [spritesheet.get_sprite(x_new, y, self.width, self.height) for y in y_new]
 
         elif self.facing == Direction.UP or self.facing == Direction.DOWN:
-            xs, y = sprite_data[self.facing]
-            frames = [spritesheet.get_sprite(x, y, self.width, self.height) for x in xs]
-
-        else:
-            return
+            frames = [spritesheet.get_sprite(x, y_new, self.width, self.height) for x in x_new]
 
         for frame in frames:
             self.image = frame
@@ -195,14 +189,14 @@ class Player(Object):
         self.death_image()
 
     def animate(self):
-        map = {
+        dir_map = {
             Direction.LEFT: self.left,
             Direction.RIGHT: self.right,
             Direction.UP: self.up,
             Direction.DOWN: self.down,
         }
 
-        self.image = map[self.facing][math.floor(self.frame)]
+        self.image = dir_map[self.facing][math.floor(self.frame)]
         self.frame += 0.2
 
         if self.frame > 3.6:
