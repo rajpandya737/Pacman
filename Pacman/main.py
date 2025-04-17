@@ -94,7 +94,6 @@ class Game:
         self.clock.tick(FPS)
         pg.display.update()
 
-
     def main(self):
         while self.playing:
             self.events()

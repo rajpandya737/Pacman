@@ -1,6 +1,7 @@
 import pygame as pg
 from config import BLACK
 
+
 class Spritesheet:
     def __init__(self, file):
         self.sheet = pg.image.load(file).convert()
